@@ -2,6 +2,7 @@
 from dotenv import load_dotenv
 from bcrypt import hashpw, gensalt
 from os import getenv
+from datetime import datetime
 load_dotenv()
 API_KEY = getenv('API_KEY')
 import requests
@@ -29,7 +30,7 @@ class Client:
     mandatory_fields = {
         'first_name': str, 'last_name': str, 'age': int, 'gender': str,
         'country': str, 'state': str, 'street':str, 'muncipality': str,
-        'city_or_town': str, 'password':str
+        'city_or_town': str, 'password':str, 'email': str
         }
     field_count = len(mandatory_fields.keys())
     def __init__(self, **kwargs) -> None:
@@ -47,14 +48,15 @@ class Client:
             raise ValueError('incorrect number of fields')
         for field, value in kwargs.items():
             if field in Client.mandatory_fields and isinstance(value, Client.mandatory_fields[field]):
-                # if field == 'password':
-                #     value = value.encode('utf-8')
-                #     hashed_password = hashpw(value, gensalt())
-                #     value = hashed_password
-                #     value = value.decode('utf-8')
+                if field == 'password':
+                    value = value.encode('utf-8')
+                    hashed_password = hashpw(value, gensalt())
+                    value = hashed_password
+                    # value = value.decode('utf-8')
                 setattr(self, field, value)
             else:
                 raise ValueError('invalid field or value')
+        self.created_on = str(datetime.today())
         try:
             self.position = Client.geocode_user(self.country, self.state, self.city_or_town, self.muncipality, self.street)
         except Exception as error:
