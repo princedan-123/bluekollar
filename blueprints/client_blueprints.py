@@ -1,4 +1,4 @@
-"""Client blueprint that contains endpoints without authentication."""
+"""A blueprint for client routes."""
 from flask import Blueprint, request, jsonify, g, session
 from models.client import Client
 import bcrypt
@@ -77,3 +77,23 @@ def client_profile():
         return jsonify(user), 200
     else:
         return jsonify({'error': 'user not logged in'})
+    
+@client_routes.route('/remove', methods=['DELETE'], strict_slashes=False)
+def remove_client():
+    """"A routes that deletes a client's account."""
+    #  check if the client is logged in.
+    if not session:
+        return jsonify({' error': 'user not logged in'})
+    payload = request.get_json()
+    email = payload.get('email')
+    password = payload.get('password')
+    if not email:
+        return jsonify({ 'error': 'email field is missing.'})
+    if not password:
+        return jsonify({' error: password field is missing.'})
+    mongo = g.mongo
+    result = mongo.db['client'].delete_one({'email': email})
+    if result.deleted_count == 1:
+        return jsonify({ 'success': 'user removed'}), 400
+    return jsonify({ 'error': 'no user removed, check if email is valid'}), 400
+    
