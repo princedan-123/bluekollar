@@ -1,4 +1,4 @@
-"""A client model that represents the client"""
+"""A worker model that represents a worker instance"""
 from dotenv import load_dotenv
 from bcrypt import hashpw, gensalt
 from os import getenv
@@ -66,11 +66,15 @@ class Worker:
     @staticmethod
     def geocode_user(country, state, city_or_town, muncipality, address):
         """
-        Geocodes  client location using an external API.
+        Geocodes a worker location using an external API.
         Parameters:
-            kwargs(dict): Keyword arguments.
+            country(str): the worker's country.
+            state(str): the worker's state.
+            city_or_town(str): the worker's city or town.
+            muncipality(str): the worker's muncipality or local government area.
+            street(str): the worker's street name and number.
         Returns:
-            position(dict): The coordinate result from the geocoding.
+            position(dict): The coordinate result from the geocoding in latitude and longitutde.
         """
         # use has attribute to check if instance has the following attributes
         searchText = f'{country} {state} {city_or_town} {address} {muncipality}'
