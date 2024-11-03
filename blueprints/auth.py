@@ -110,27 +110,22 @@ def search(profession):
             #  get the coordinate from session data if user is logged in
             client_coordinate = session.get('coordinates')
             location_data.update(session)
-            print(f'This is the location data when not logged in {location_data}')
         else:
             return jsonify({'error': 'client location data is missing, or user not logged in'}), 400
         client_matrix = [{'point': {'latitude':client_coordinate['latitude'], 'longitude': client_coordinate['longitude']}}]
-        print(f'client matrix!!!: {client_matrix}')
         #  get workers' coordinates
         mongo = g.mongo
         country = location_data.get('country')
         state = location_data.get('state')
         city_or_town = location_data.get('city_or_town')
         street = location_data.get('street')
-        print(f'client street: {street}')
         workers = mongo.db['worker'].find({
             'country': country, 'state': state, 'city_or_town': city_or_town,
             'profession': re.compile(f'{profession}', re.IGNORECASE)
             }, {'password': 0, '_id': 0})
         workers = list(workers)
-        print(f'workers: {workers}')
         #  used list comprenshion to create destination point for api matrix request
         workers_matrix = [{'point': {'latitude': worker['position']['latitude'], 'longitude': worker['position']['longitude']}} for worker in workers]
-        print(f'worker matrix {workers_matrix}')
         api_matrix_request = {
             'origins': client_matrix,
             'destinations': workers_matrix,
@@ -139,11 +134,9 @@ def search(profession):
                 'traffic': 'historical'
                 }
             }
-        print(f'api matrix request {api_matrix_request}')
         api_base_url = 'api.tomtom.com'
         version_number = 2
         response = requests.post(f'https://{api_base_url}/routing/matrix/{version_number}', params={'key': API_KEY }, json=api_matrix_request)
-        print(f'response from api {response.json()}')
         if response.status_code == 200:
             response_body = response.json()
             #  sort the result in ascending order

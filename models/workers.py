@@ -80,7 +80,6 @@ class Worker:
         searchText = f'{country} {state} {city_or_town} {address} {muncipality}'
         url = f'https://api.tomtom.com/search/2/geocode/{searchText}.json'
         response = requests.get(url, params={'key': API_KEY}, timeout=180)
-        print(f'workers geocoding api result: {response.json()}')
         try:
             response = response.json()
             results = response.get('results', [])
