@@ -23,7 +23,7 @@ class Client:
         gender(str): The client's gender.
         country(str): The client's country.
         state(str): The client's state.
-        address(str): The client's address.
+        street(str): The client's address.
         city_or_town(str): The client's city or town
         muncipality(str): The clients locality.
     """
@@ -62,7 +62,7 @@ class Client:
         except Exception as error:
             raise error
     @staticmethod
-    def geocode_user(country, state, city_or_town, muncipality, address):
+    def geocode_user(country, state, city_or_town, muncipality, street):
         """
         Geocodes  client location using an external API.
         Parameters:
@@ -71,9 +71,10 @@ class Client:
             position(dict): The coordinate result from the geocoding.
         """
         # use has attribute to check if instance has the following attributes
-        searchText = f'{country} {state} {city_or_town} {address} {muncipality}'
+        searchText = f'{country} {state} {city_or_town} {street} {muncipality}'
         url = f'https://api.tomtom.com/search/2/geocode/{searchText}.json'
         response = requests.get(url, params={'key': API_KEY}, timeout=180)
+        print(f'geocoding result {response.json()}')
         try:
             response = response.json()
             results = response.get('results', [])
@@ -89,3 +90,22 @@ class Client:
             return position
         else:
             raise Exception('geocoding failed please provide a descriptive location')
+    
+    @staticmethod
+    def validate_location_data(country, state, city_or_town, muncipality, street):
+        """
+        A static method that validates location data.
+        Parameters:
+           country(str): The clients country.
+           state(str): The state where the client resides.
+           city_or_town(str): The client's city or town.
+           muncipality(str): The local government area or client's muncipality.
+           address(str): The clients address including street name and number. 
+        """
+        if not isinstance(country, str) and not isinstance(state, str):
+            raise ValueError('location data invalid data type')
+        if not isinstance(city_or_town, str) and not isinstance(muncipality, str):
+            raise ValueError('location data invalid data type')
+        if not isinstance(street, str):
+            raise ValueError('location data invalid data type')
+        return True
