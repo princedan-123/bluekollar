@@ -153,3 +153,12 @@ def search(profession):
     except Exception as error:
         error = str(error)
         return jsonify({'error': error}), 500
+
+@auth.route('/logout', methods=['DELETE'], strict_slashes=False)
+def logout():
+    """A route that logs out users."""
+    if session and session.get('last_name'):
+        last_name = session.get('last_name')
+        session.clear()
+        return jsonify({'success': f'logged out {last_name}'}), 200
+    return jsonify({'error': 'user not logged in'}), 400
